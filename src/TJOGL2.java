@@ -55,7 +55,15 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
  
             // Create the top-level container
             final JFrame frame = new JFrame(); // Swing's JFrame or AWT's Frame
-            frame.getContentPane().add(canvas);
+            JPanel panel1 = new JPanel();
+            JPanel panel2 = new JPanel();
+            
+            FlowLayout fl = new FlowLayout();
+            frame.setLayout(fl);
+            
+            panel1.add(canvas);
+            frame.getContentPane().add(panel1);
+            frame.getContentPane().add(panel2);
             frame.addKeyListener((KeyListener)canvas);
             frame.addWindowListener(new WindowAdapter() {
                @Override
@@ -186,7 +194,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
 
       drawPyramid(0,0,0,4.0f,4.0f,gl); 
 
-      gl.glLoadIdentity();
+      //gl.glLoadIdentity();
       gl.glTranslatef(2.0f, 0.0f, -15.0f); // translate into the screen            
       gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
       gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
