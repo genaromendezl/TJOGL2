@@ -16,6 +16,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.gl2.GLUT;        
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.GL;
 import static com.jogamp.opengl.GL.*;  // GL constants
@@ -91,6 +92,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
    // Setup OpenGL Graphics Renderer
  
    private GLU glu;  // for the GL Utility
+   private GLUT glut;
  
    /** Constructor to setup the GUI for this Component */
    public TJOGL2() {
@@ -107,7 +109,8 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
    @Override
    public void init(GLAutoDrawable drawable) {
       GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
-      glu = new GLU();                         // get GL Utilities
+      glu = new GLU();                        // get GL Utilities
+      glut = new GLUT();
       gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
       gl.glClearDepth(1.0f);      // set clear depth value to farthest
       gl.glEnable(GL_DEPTH_TEST); // enables depth testing
@@ -159,7 +162,28 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
       gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
       gl.glLineWidth(1.5f);
+   
+      glu.gluLookAt(0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+     
+      if (rotX<0) rotX=360-factInc;
+      if (rotY<0) rotY=360-factInc;
+      if (rotZ<0) rotZ=360-factInc;
 
+      if (rotX>=360) rotX=0;
+      if (rotY>=360) rotY=0;
+      if (rotZ>=360) rotZ=0;
+      
+      // ----- Your OpenGL rendering code here (Render a white triangle for testing) -----
+                 
+      gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+      gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+      gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
+      gl.glColor3f(0.5f, 0.5f, 0.5f);
+      
+      glut.glutWireTeapot(5);
+      
+      
+      /*
       gl.glColor3f(0.5f, 0.5f, 0.5f);       
       
       // Dibujar los ejes
@@ -201,6 +225,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
       
       drawPyramid(0,0,0,4.0f,4.0f,gl);                  
+      */
       
       gl.glFlush();
       
