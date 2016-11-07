@@ -40,6 +40,10 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
    float rotX=0.0f;
    float rotY=0.0f;
    float rotZ=0.0f;
+   
+   float posCamX = 0.0f;
+   float posCamY = 0.0f;
+   float posCamZ = 0.0f;
  
    /** The entry main() method to setup the top-level container and animator */
    public static void main(String[] args) {
@@ -116,9 +120,25 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glEnable(GL_DEPTH_TEST); // enables depth testing
       gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
       gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best perspective correction
+      
+      float[] whiteMaterial={1.0f, 1.0f, 1.0f};
+      gl.glMaterialfv(GL.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, whiteMaterial,0);
       gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
  
       // ----- Your OpenGL initialization code here -----
+      float[] ambientLight = { 0.1f, 1.f, 1.f,0f };  // weak RED ambient 
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); 
+      float[] diffuseLight = { 1f,1f,1f,0f };  // multicolor diffuse 
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); 
+      float[] specularLight = { 1f,1f,1f,0f };  // specular 
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, specularLight, 0); 
+      
+      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
+              
+      gl.glEnable(GL2.GL_LIGHTING);      
+      gl.glEnable(GL2.GL_LIGHT0);
+       
    }
  
    /**
@@ -163,7 +183,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
       gl.glLineWidth(1.5f);
    
-      glu.gluLookAt(0.0, 0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+      glu.gluLookAt(0.0, 0.0, 20.0, this.posCamX, this.posCamY, this.posCamZ, 0.0, 1.0, 0.0);
      
       if (rotX<0) rotX=360-factInc;
       if (rotY<0) rotY=360-factInc;
@@ -180,7 +200,10 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
       gl.glColor3f(0.5f, 0.5f, 0.5f);
       
-      glut.glutWireTeapot(5);
+      
+      ///gl.glMaterialfv(
+      
+      glut.glutSolidTeapot(5);
       
       
       /*
@@ -308,6 +331,18 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int cod = e.getKeyCode();
         switch(cod){
+            case KeyEvent.VK_UP:
+                posCamY +=0.5f;
+                break;
+            case KeyEvent.VK_DOWN:    
+                posCamY -=0.5f;
+                break;                
+            case KeyEvent.VK_LEFT:
+                posCamX -=0.5f;
+                break;                
+            case KeyEvent.VK_RIGHT:                
+                posCamX +=0.5f;                
+                break;                
             case KeyEvent.VK_F1:
                     fovy+=factInc; break;
             case KeyEvent.VK_F2:
