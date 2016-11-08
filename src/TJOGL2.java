@@ -115,7 +115,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
       glu = new GLU();                        // get GL Utilities
       glut = new GLUT();
-      gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set background (clear) color
+      gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set background (clear) color
       gl.glClearDepth(1.0f);      // set clear depth value to farthest
       gl.glEnable(GL_DEPTH_TEST); // enables depth testing
       gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
@@ -126,9 +126,9 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
  
       // ----- Your OpenGL initialization code here -----
-      float[] ambientLight = { 0.1f, 1.f, 1.f,0f };  // weak RED ambient 
+      float[] ambientLight = { 0.5f, .5f, .5f,0.5f };  // weak RED ambient 
       gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); 
-      float[] diffuseLight = { 1f,1f,1f,0f };  // multicolor diffuse 
+      float[] diffuseLight = { .8f,.8f,.8f,0f };  // multicolor diffuse 
       gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); 
       float[] specularLight = { 1f,1f,1f,0f };  // specular 
       gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, specularLight, 0); 
@@ -198,14 +198,34 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
       gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
       gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-      gl.glColor3f(0.5f, 0.5f, 0.5f);
       
+
+
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        /*
+         * draw sphere in first row, first column diffuse reflection only; no
+         * ambient or specular
+         */
+//        gl.glPushMatrix();
+        float no_mat[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        float mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+        float mat_ambient_color[] = { 0.8f, 0.8f, 0.2f, 1.0f };
+        float mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
+        float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        float no_shininess[] = { 0.0f };
+        float low_shininess[] = { 5.0f };
+        float high_shininess[] = { 100.0f };
+        float mat_emission[] = { 0.3f, 0.2f, 0.2f, 0.0f };
+
+        gl.glMaterialfv(GL.GL_FRONT, GL2.GL_AMBIENT, no_mat, 0);
+        gl.glMaterialfv(GL.GL_FRONT, GL2.GL_DIFFUSE, mat_diffuse, 0);
+        gl.glMaterialfv(GL.GL_FRONT, GL2.GL_SPECULAR, no_mat, 0);
+        gl.glMaterialfv(GL.GL_FRONT, GL2.GL_SHININESS, high_shininess, 0);
+        gl.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, mat_emission, 0);
+
+        glut.glutSolidTeapot(5);
       
-      ///gl.glMaterialfv(
-      
-      glut.glutSolidTeapot(5);
-      
-      
+//      gl.glPopMatrix();      
       /*
       gl.glColor3f(0.5f, 0.5f, 0.5f);       
       
