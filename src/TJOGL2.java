@@ -21,6 +21,8 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.GL;
 import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
  
 /**
  * JOGL 2.0 Program Template (GLCanvas)
@@ -44,6 +46,8 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
    float posCamX = 0.0f;
    float posCamY = 0.0f;
    float posCamZ = 0.0f;
+   
+   Texture textura1;
  
    /** The entry main() method to setup the top-level container and animator */
    public static void main(String[] args) {
@@ -182,7 +186,10 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
       gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
       gl.glLineWidth(1.5f);
-   
+      
+      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
+      
       glu.gluLookAt(0.0, 0.0, 20.0, this.posCamX, this.posCamY, this.posCamZ, 0.0, 1.0, 0.0);
      
       if (rotX<0) rotX=360-factInc;
@@ -208,9 +215,9 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
          */
 //        gl.glPushMatrix();
         float no_mat[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        float mat_ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-        float mat_ambient_color[] = { 0.8f, 0.8f, 0.2f, 1.0f };
-        float mat_diffuse[] = { 0.1f, 0.5f, 0.8f, 1.0f };
+        float mat_ambient[] = { 0.0f, 0.7f, 0.0f, 1.0f };
+        float mat_ambient_color[] = { 0.0f, 0.8f, 0.0f, 1.0f };
+        float mat_diffuse[] = { 0.1f, 0.5f, 0.0f, 1.0f };
         float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         float no_shininess[] = { 0.0f };
         float low_shininess[] = { 5.0f };
