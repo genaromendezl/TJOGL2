@@ -21,9 +21,17 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.GL;
 import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
+import static com.jogamp.opengl.GL2ES3.GL_QUADS;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
- 
+
+// Clases necesarias para el uso de texturas
+import com.jogamp.opengl.GLProfile;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
 /**
  * JOGL 2.0 Program Template (GLCanvas)
  * This is a "Component" which can be added into a top-level "Container".
@@ -96,7 +104,17 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
          }
       });
    }
- 
+   
+   Texture loadTexture(String imageFile){
+       Texture text1 = null;
+       try {
+            BufferedImage buffImage = ImageIO.read(new File("/"+imageFile));           
+            text1 = AWTTextureIO.newTexture(GLProfile.getDefault(),buffImage,false);
+       } catch (IOException ioe){
+           System.out.println("Problema al cargar el archivo "+imageFile);
+       }  
+       return text1;
+   }
    // Setup OpenGL Graphics Renderer
  
    private GLU glu;  // for the GL Utility
@@ -135,10 +153,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       float[] diffuseLight = { .8f,.8f,.8f,0f };  // multicolor diffuse 
       gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); 
       float[] specularLight = { 1f,1f,1f,0f };  // specular 
-      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, specularLight, 0); 
-      
-      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
-      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, specularLight, 0);       
               
       gl.glEnable(GL2.GL_LIGHTING);      
       gl.glEnable(GL2.GL_LIGHT0);
@@ -178,6 +193,8 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
       gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color and depth buffers
 
+      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
+      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
       
       gl.glLoadIdentity();  // reset the model-view matrix
       gl.glEnable(GL.GL_LINE_SMOOTH);
@@ -186,10 +203,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
       gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
       gl.glLineWidth(1.5f);
-      
-      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
-      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
-      
+           
       glu.gluLookAt(0.0, 0.0, 20.0, this.posCamX, this.posCamY, this.posCamZ, 0.0, 1.0, 0.0);
      
       if (rotX<0) rotX=360-factInc;
@@ -230,60 +244,12 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
         gl.glMaterialfv(GL.GL_FRONT, GL2.GL_SHININESS, high_shininess, 0);
         gl.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, mat_emission, 0);
 
-        glut.glutSolidTeapot(5);
-      
-//      gl.glPopMatrix();      
-      /*
-      gl.glColor3f(0.5f, 0.5f, 0.5f);       
-      
-      // Dibujar los ejes
-      gl.glBegin(GL_LINES);         
-         gl.glVertex3f(-10.0f, 0.0f, 0.0f);         
-         gl.glVertex3f(10.0f, 0.0f, 0.0f);        
-      gl.glEnd();
-
-      gl.glBegin(GL_LINES);
-         gl.glVertex3f(0.0f, -10.0f, 0.0f);         
-         gl.glVertex3f(0.0f, 10.0f, 0.0f);        
-      gl.glEnd();
-
-      gl.glBegin(GL_LINES);
-         gl.glVertex3f(0.0f, 0.0f, -10.0f);         
-         gl.glVertex3f(0.0f, 0.0f, 10.0f);        
-      gl.glEnd();
-      
-      if (rotX<0) rotX=360-factInc;
-      if (rotY<0) rotY=360-factInc;
-      if (rotZ<0) rotZ=360-factInc;
-
-      if (rotX>=360) rotX=0;
-      if (rotY>=360) rotY=0;
-      if (rotZ>=360) rotZ=0;
-      
-      // ----- Your OpenGL rendering code here (Render a white triangle for testing) -----
-      gl.glTranslatef(0.0f, 0.0f, -10.0f); // translate into the screen            
-      gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
-      gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
-      gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-
-      drawPyramid(0,0,0,4.0f,4.0f,gl); 
-
-      //gl.glLoadIdentity();
-      gl.glTranslatef(2.0f, 0.0f, -15.0f); // translate into the screen            
-      gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
-      gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
-      gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-      
-      drawPyramid(0,0,0,4.0f,4.0f,gl);                  
-      */
+        this.drawCube(5,5,5,gl);
       
       gl.glFlush();
       
-      
-      
    }
  
-   
    void drawPyramid(float x,float y,float z,float w,float h,GL2 gl){
       float mw=w/2;
       float mh=h/2;
@@ -342,6 +308,51 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
          gl.glVertex3f(xi, yi, zp);
       gl.glEnd();          
    }
+
+   void drawCube(float w,float h,float f, GL2 gl){       
+      gl.glBegin(GL_QUADS); // draw front face
+         gl.glVertex3f(0, 0, 0);
+         gl.glVertex3f(0, h, 0);                 
+         gl.glVertex3f(w, h, 0);                 
+         gl.glVertex3f(w, 0, 0);                 
+      gl.glEnd();
+      
+      gl.glBegin(GL_QUADS); // draw back face
+         gl.glVertex3f(0, 0, f);
+         gl.glVertex3f(0, h, f);                 
+         gl.glVertex3f(w, h, f);                 
+         gl.glVertex3f(w, 0, f);                 
+      gl.glEnd();
+      
+      gl.glBegin(GL_QUADS); // draw right face
+         gl.glVertex3f(w, 0, 0);
+         gl.glVertex3f(w, h, 0);                 
+         gl.glVertex3f(w, h, f);                 
+         gl.glVertex3f(w, 0, f);                 
+      gl.glEnd();
+
+      gl.glBegin(GL_QUADS); // draw left face
+         gl.glVertex3f(0, 0, 0);
+         gl.glVertex3f(0, h, 0);                 
+         gl.glVertex3f(0, h, f);                 
+         gl.glVertex3f(0, 0, f);                 
+      gl.glEnd();
+      
+      gl.glBegin(GL_QUADS); // draw up face
+         gl.glVertex3f(0, h, 0);
+         gl.glVertex3f(0, h, f);                 
+         gl.glVertex3f(w, h, f);                 
+         gl.glVertex3f(w, h, 0);                 
+      gl.glEnd();
+      
+      gl.glBegin(GL_QUADS); // draw base face
+         gl.glVertex3f(0, 0, 0);
+         gl.glVertex3f(0, 0, f);                 
+         gl.glVertex3f(w, 0, f);                 
+         gl.glVertex3f(w, 0, 0);                 
+      gl.glEnd();      
+   }
+   
    
    /**
     * Called back before the OpenGL context is destroyed. Release resource such as buffers.
