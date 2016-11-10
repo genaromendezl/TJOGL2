@@ -22,10 +22,10 @@ import com.jogamp.opengl.GL;
 import static com.jogamp.opengl.GL.*;  // GL constants
 import static com.jogamp.opengl.GL2.*; // GL2 constants
 import static com.jogamp.opengl.GL2ES3.GL_QUADS;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 
 // Clases necesarias para el uso de texturas
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
 import com.jogamp.opengl.GLProfile;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -108,7 +108,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
    Texture loadTexture(String imageFile){
        Texture text1 = null;
        try {
-            BufferedImage buffImage = ImageIO.read(new File("/"+imageFile));           
+            BufferedImage buffImage = ImageIO.read(new File(imageFile));           
             text1 = AWTTextureIO.newTexture(GLProfile.getDefault(),buffImage,false);
        } catch (IOException ioe){
            System.out.println("Problema al cargar el archivo "+imageFile);
@@ -157,7 +157,15 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
               
       gl.glEnable(GL2.GL_LIGHTING);      
       gl.glEnable(GL2.GL_LIGHT0);
-       
+      
+      this.textura1 = this.loadTexture("imagenes/Pena-Nieto-y-Donald-Trump.jpg");
+      
+      // Habilitar el uso de texturas
+      gl.glEnable(GL2.GL_TEXTURE_2D);
+      gl.glEnable(GL2.GL_BLEND);
+
+      // Especificar la funcion de mezcla "adherencia" de textura
+      gl.glBlendFunc(GL2.GL_ONE, GL2.GL_ONE_MINUS_SRC_ALPHA);       
    }
  
    /**
@@ -177,7 +185,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       // Setup perspective projection, with aspect ratio matches viewport
       gl.glMatrixMode(GL_PROJECTION);  // choose projection matrix
       gl.glLoadIdentity();             // reset projection matrix
-      glu.gluPerspective(fovy, aspect, 0.1, 100.0); // fovy, aspect, zNear, zFar
+      glu.gluPerspective(fovy, aspect, 0.1, 50.0); // fovy, aspect, zNear, zFar
  
       // Enable the model-view transform
       gl.glMatrixMode(GL_MODELVIEW);
@@ -189,49 +197,47 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
     */
    @Override
    public void display(GLAutoDrawable drawable) {
-      float aspect = (float)this.getWidth() / this.getHeight();
-      GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
-      gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color and depth buffers
+       
+        float aspect = (float)this.getWidth() / this.getHeight();
+        GL2 gl = drawable.getGL().getGL2();  // get the OpenGL 2 graphics context
+        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color and depth buffers
 
-      float[] lightPos = { 0.0f,5.0f,20.0f,1 };
-      gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
-      
-      gl.glLoadIdentity();  // reset the model-view matrix
-      gl.glEnable(GL.GL_LINE_SMOOTH);
-      gl.glEnable(GL.GL_BLEND);
+        float[] lightPos = { 0.0f,5.0f,10.0f,1 };
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION,lightPos, 0);
+
+        gl.glLoadIdentity();  // reset the model-view matrix
+        gl.glEnable(GL.GL_LINE_SMOOTH);
+        gl.glEnable(GL.GL_BLEND);
+
+        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
+
+        glu.gluLookAt(0.0, 0.0, 5.0, this.posCamX, this.posCamY, this.posCamZ, 0.0, 1.0, 0.0);
         
-      gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-      gl.glHint(GL.GL_LINE_SMOOTH_HINT, GL.GL_DONT_CARE);
-      gl.glLineWidth(1.5f);
-           
-      glu.gluLookAt(0.0, 0.0, 20.0, this.posCamX, this.posCamY, this.posCamZ, 0.0, 1.0, 0.0);
-     
-      if (rotX<0) rotX=360-factInc;
-      if (rotY<0) rotY=360-factInc;
-      if (rotZ<0) rotZ=360-factInc;
+        if (rotX<0) rotX=360-factInc;
+        if (rotY<0) rotY=360-factInc;
+        if (rotZ<0) rotZ=360-factInc;
 
-      if (rotX>=360) rotX=0;
-      if (rotY>=360) rotY=0;
-      if (rotZ>=360) rotZ=0;
+        if (rotX>=360) rotX=0;
+        if (rotY>=360) rotY=0;
+        if (rotZ>=360) rotZ=0;
+
+        // ----- Your OpenGL rendering code here (Render a white triangle for testing) -----
+
+        gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+        gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+        gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
       
-      // ----- Your OpenGL rendering code here (Render a white triangle for testing) -----
-                 
-      gl.glRotatef(rotX, 1.0f, 0.0f, 0.0f);
-      gl.glRotatef(rotY, 0.0f, 1.0f, 0.0f);
-      gl.glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
-      
-
-
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         /*
          * draw sphere in first row, first column diffuse reflection only; no
          * ambient or specular
          */
-//        gl.glPushMatrix();
+    //        gl.glPushMatrix();
         float no_mat[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        float mat_ambient[] = { 0.0f, 0.7f, 0.0f, 1.0f };
+        float mat_ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
         float mat_ambient_color[] = { 0.0f, 0.8f, 0.0f, 1.0f };
-        float mat_diffuse[] = { 0.1f, 0.5f, 0.0f, 1.0f };
+        float mat_diffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };
         float mat_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         float no_shininess[] = { 0.0f };
         float low_shininess[] = { 5.0f };
@@ -244,13 +250,101 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
         gl.glMaterialfv(GL.GL_FRONT, GL2.GL_SHININESS, high_shininess, 0);
         gl.glMaterialfv(GL.GL_FRONT, GL2.GL_EMISSION, mat_emission, 0);
 
-        this.drawCube(5,5,5,gl);
+        // Asociar la textura con el canvas
+        this.textura1.bind(gl);
+        this.textura1.enable(gl); 
+        
+        this.drawCube(gl);
+        //this.drawCubeUVWmapped(gl);
+    
       
-      gl.glFlush();
+        gl.glFlush();
       
    }
- 
-   void drawPyramid(float x,float y,float z,float w,float h,GL2 gl){
+
+    void drawCube(GL2 gl){     
+
+        gl.glBegin(GL2.GL_QUADS);
+        // Front Face
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left
+        // Back Face
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left
+        // Top Face
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        // Bottom Face
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+        // Right face
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+        // Left Face
+        gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+        gl.glEnd();
+    }
+
+    /**
+     * Render 2 unit cube with texture coordinates, mapped to 8 separate faces
+     * in texture image.
+     *              ___________
+     *             |   | T |   |
+     *             |___|___|___|
+     *             | L | F | R |
+     *             |___|___|___|
+     *             |   | B | BB|
+     *             |___|___|___|
+     */
+    public static void drawCubeUVWmapped(GL2 gl) {
+        gl.glBegin(GL2.GL_QUADS);
+        // Left Face
+        gl.glTexCoord2f(0.0f, .33f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left
+        gl.glTexCoord2f(.33f, .33f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(.33f, .66f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right
+        gl.glTexCoord2f(0.0f, .66f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+        // Front Face
+        gl.glTexCoord2f(.33f, .33f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(.66f, .33f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(.66f, .66f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right
+        gl.glTexCoord2f(.33f, .66f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left
+        // Right face
+        gl.glTexCoord2f(.66f, .33f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, .33f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, .66f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(.66f, .66f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left
+        // Top Face
+        gl.glTexCoord2f(.33f, .66f); gl.glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(.66f, .66f); gl.glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(.66f, 1.0f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(.33f, 1.0f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+        // Bottom Face
+        gl.glTexCoord2f(.66f, .33f); gl.glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+        gl.glTexCoord2f(.33f, .33f); gl.glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+        gl.glTexCoord2f(.33f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(.66f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left
+        // Back Face
+        gl.glTexCoord2f(.66f, 0.0f); gl.glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left
+        gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right
+        gl.glTexCoord2f(1.0f, .33f); gl.glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right
+        gl.glTexCoord2f(.66f, .33f); gl.glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left
+        gl.glEnd();
+    }
+   
+    void drawPyramid(float x,float y,float z,float w,float h,GL2 gl){
       float mw=w/2;
       float mh=h/2;
       float xi,xd,ys,yi,zf,zp;
@@ -309,51 +403,6 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glEnd();          
    }
 
-   void drawCube(float w,float h,float f, GL2 gl){       
-      gl.glBegin(GL_QUADS); // draw front face
-         gl.glVertex3f(0, 0, 0);
-         gl.glVertex3f(0, h, 0);                 
-         gl.glVertex3f(w, h, 0);                 
-         gl.glVertex3f(w, 0, 0);                 
-      gl.glEnd();
-      
-      gl.glBegin(GL_QUADS); // draw back face
-         gl.glVertex3f(0, 0, f);
-         gl.glVertex3f(0, h, f);                 
-         gl.glVertex3f(w, h, f);                 
-         gl.glVertex3f(w, 0, f);                 
-      gl.glEnd();
-      
-      gl.glBegin(GL_QUADS); // draw right face
-         gl.glVertex3f(w, 0, 0);
-         gl.glVertex3f(w, h, 0);                 
-         gl.glVertex3f(w, h, f);                 
-         gl.glVertex3f(w, 0, f);                 
-      gl.glEnd();
-
-      gl.glBegin(GL_QUADS); // draw left face
-         gl.glVertex3f(0, 0, 0);
-         gl.glVertex3f(0, h, 0);                 
-         gl.glVertex3f(0, h, f);                 
-         gl.glVertex3f(0, 0, f);                 
-      gl.glEnd();
-      
-      gl.glBegin(GL_QUADS); // draw up face
-         gl.glVertex3f(0, h, 0);
-         gl.glVertex3f(0, h, f);                 
-         gl.glVertex3f(w, h, f);                 
-         gl.glVertex3f(w, h, 0);                 
-      gl.glEnd();
-      
-      gl.glBegin(GL_QUADS); // draw base face
-         gl.glVertex3f(0, 0, 0);
-         gl.glVertex3f(0, 0, f);                 
-         gl.glVertex3f(w, 0, f);                 
-         gl.glVertex3f(w, 0, 0);                 
-      gl.glEnd();      
-   }
-   
-   
    /**
     * Called back before the OpenGL context is destroyed. Release resource such as buffers.
     */
@@ -385,7 +434,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
                     fovy+=factInc; break;
             case KeyEvent.VK_F2:
                     fovy-=factInc; break;   
-            case KeyEvent.VK_F3:
+            case KeyEvent.VK_3:
                 switch(eje){
                     case 1:
                         rotX+=factInc; break;
@@ -395,7 +444,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
                         rotZ+=factInc; break;                        
                 }
                 break;
-            case KeyEvent.VK_F4:
+            case KeyEvent.VK_4:
                 switch(eje){
                     case 1:
                         rotX-=factInc; break;
