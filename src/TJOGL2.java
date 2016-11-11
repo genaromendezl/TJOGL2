@@ -254,9 +254,11 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
         this.textura1.bind(gl);
         this.textura1.enable(gl); 
         
-        this.drawCube(gl);
+        gl.glTexCoord1f(4);
+        glut.glutSolidTeapot(1);
+        //this.drawCube(gl);
         //this.drawCubeUVWmapped(gl);
-    
+        this.textura1.disable(gl);
       
         gl.glFlush();
       
