@@ -158,7 +158,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
       gl.glEnable(GL2.GL_LIGHTING);      
       gl.glEnable(GL2.GL_LIGHT0);
       
-      this.textura1 = this.loadTexture("imagenes/Pena-Nieto-y-Donald-Trump.jpg");
+      this.textura1 = this.loadTexture("imagenes/Chivas-1.jpg");
       
       // Habilitar el uso de texturas
       gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -256,6 +256,7 @@ public class TJOGL2 extends GLCanvas implements GLEventListener, KeyListener {
         
         gl.glTexCoord1f(4);
         glut.glutSolidTeapot(1);
+        //glut.glutSolidSphere(1, 50, 50);
         //this.drawCube(gl);
         //this.drawCubeUVWmapped(gl);
         this.textura1.disable(gl);
